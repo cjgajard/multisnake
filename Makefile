@@ -8,7 +8,7 @@ OUT_NAME = ${OUT_DIR}/main
 OBJ := main.o movement.o snake.o game.o
 SRC = $(OBJ:.o=.c)
 
-TEST := minunit.c
+TEST := minunit
 
 .PHONY: auto directories build
 
@@ -24,8 +24,8 @@ directories:
 build: $(OBJ)
 	$(CC) -o $(OUT_NAME) $^ $(LIBS) $(CFLAGS)
 
-test: $(OBJ)
-	@gcc $(TEST) $(OBJ) -o $@ && ./$@ || true
+test: test_$(TEST).c $(DEPS)
+	gcc $^ -o $@ && ./$@ || true
 	-@rm $@
 
 clean:
