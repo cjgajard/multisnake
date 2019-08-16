@@ -1,3 +1,5 @@
+#ifndef MOVEMENT_H
+#define MOVEMENT_H
 /*
  * 2D movement directions.
  */
@@ -32,3 +34,4 @@ int movement(int position, int direction);
  * Returns the new direction after turning in +-90 degrees.
  */
 int turn(int direction, int directive);
+#endif

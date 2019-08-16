@@ -1,16 +1,24 @@
+#ifndef SNAKE_H
+#define SNAKE_H
+#include "movement.h"
+
 /*
  * Stores a fraction of a snake string.
  */
-struct snake {
-	// struct snake *previous;
-	struct snake *next;
-	int *directive;
-	int direction;
-	int next_dir;
+struct snake_tail {
+	// struct snake_tail *previous;
+	struct snake_tail *next;
+	enum direction direction;
 	int position;
 };
 
-/*
- * updates the position of a snake point
- */
-void move_snake(struct snake *snake);
+struct snake {
+	struct snake_tail *head;
+	enum directive directive;
+};
+
+struct snake *snake_New(void);
+void snake_Append(struct snake *s);
+void snake_Destroy(struct snake *s);
+void snake_Update(struct snake *s);
+#endif
