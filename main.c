@@ -5,8 +5,6 @@
 #include "snake.h"
 #include "renderer.h"
 
-#define LENGTH(x) (sizeof(x) / sizeof((x)[0]))
-
 /*
  * Execution
  */
@@ -23,17 +21,17 @@ int main(int argc, const char* args[])
 
 	// main loop
 	while (!quitflag) {
-		if (renderer_Event() == EVENTQUIT) {
-			quitflag = true;
+		if (renderer_Event() == EVENTQUIT)
 			break;
+		for (int i = 0; i < SNAKELISTLEN; i++) {
+			struct snake *s = g_snakelist[i];
+			if (s->head->position == g_food) {
+				s->grow = 1;
+				game_UpdateFood();
+			}
+			snake_Update(s);
 		}
 
-		renderer_RenderGrid();
-		for (int i = 0, l = LENGTH(g_snakelist); i < l; i++) {
-			struct snake *snake = g_snakelist[i];
-			snake_Update(snake);
-			renderer_RenderSnake(i, snake);
-		}
 		renderer_Render();
 	}
 

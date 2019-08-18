@@ -1,6 +1,7 @@
 #ifndef GAME_H
 #define GAME_H
 #include "snake.h"
+#define SNAKELISTLEN 1
 
 /*
  * Screen dimensions
@@ -13,9 +14,11 @@ extern int SCREEN_HEIGHT;
  */
 extern int g_square;
 
-extern struct snake *g_snakelist[1];
+extern struct snake *g_snakelist[SNAKELISTLEN];
 
 extern int g_selected;
+
+extern int g_food;
 
 /*
  * Initialize game variables.
@@ -29,4 +32,6 @@ void game_InputMove(enum direction d);
 void game_InputSelect(int id);
 
 void game_InputTurn(enum directive d);
+
+void game_UpdateFood();
 #endif

@@ -2,25 +2,7 @@
 #include "renderer.h"
 #include <SDL2/SDL.h>
 
-/*
- * The window we'll be rendering to.
- */
-SDL_Window *g_window = NULL;
-
-/*
- * The surface contained by the window.
- */
-SDL_Surface *g_screen_surface = NULL;
-
-/*
- * The default renderer.
- */
-SDL_Renderer *g_renderer = NULL;
-
-/*
- * Returns a SDL rectangle representing a square with position and dimentions.
- */
-SDL_Rect get_rect(int square_id);
+#define LENGTH(x) (sizeof(x) / sizeof((x)[0]))
 
 /*
  * Stores a 2D position.
@@ -29,14 +11,60 @@ struct vector {
 	int x;
 	int y;
 };
+/*
+ * The window we'll be rendering to.
+ */
+SDL_Window *g_window = NULL;
+/*
+ * The surface contained by the window.
+ */
+SDL_Surface *g_screen_surface = NULL;
+/*
+ * The default renderer.
+ */
+SDL_Renderer *g_renderer = NULL;
 
+/*
+ * Logs current SDL error and returns false
+ */
+int sdl_error(const char str[]);
+/*
+ * Returns a SDL rectangle representing a square with position and dimentions.
+ */
+SDL_Rect get_rect(int square_id);
 /*
  * Returns a vector with the distance from the origin of the top-left corner
  * of a square.
  */
 struct vector topleft_position(int square_id);
+/*
+ * Prints an error message to stderr
+ */
+void log_error(const char str[], const char err[]);
+/*
+ */
+void renderer_RenderGrid();
+/*
+ */
+void renderer_RenderSnake(int id);
+/*
+ */
+void renderer_RenderFood();
 
 /* public */
+
+void renderer_Close()
+{
+	if (g_renderer) {
+		SDL_DestroyRenderer(g_renderer);
+		g_renderer = NULL;
+	}
+	if (g_window) {
+		SDL_DestroyWindow(g_window);
+		g_window = NULL;
+	}
+	SDL_Quit();
+}
 
 int renderer_Event()
 {
@@ -64,10 +92,10 @@ int renderer_Event()
 			case SDLK_KP_1:
 				game_InputSelect(0);
 				break;
-			default:
-#if DEBUG
-				fprintf(stderr, "key=%s\n", SDL_GetKeyName(k));
-#endif
+			case SDLK_2:
+			case SDLK_KP_2:
+				game_InputSelect(1);
+				break;
 			}
 		}
 	}
@@ -75,57 +103,6 @@ int renderer_Event()
 	return EVENTNONE;
 }
 
-void renderer_RenderSnake(int id, struct snake *s)
-{
-	struct snake_tail *current = s->head;
-	while (current) {
-		SDL_Rect rect = get_rect(current->position);
-		if (id == g_selected) {
-			SDL_SetRenderDrawColor(
-					g_renderer, 0xFF, 0xFF, 0x00, 0xFF);
-		}
-		else {
-			SDL_SetRenderDrawColor(
-					g_renderer, 0xFF, 0xFF, 0xFF, 0xFF);
-		}
-		SDL_RenderFillRect(g_renderer, &rect);
-		current = current->next;
-	}
-}
-
-/* private */
-
-struct vector topleft_position(int square_id)
-{
-	int id = square_id % g_maxpos;
-	int w = g_width - 2;
-	int x = (id % w) * g_square + g_square;
-	int y = (id / w) * g_square + g_square;
-	struct vector v = {x, y};
-	return v;
-}
-
-/*
- * Prints an error message to stderr
- */
-void log_error(const char str[], const char err[])
-{
-	fprintf(stderr, "ERROR: %s!\n", str);
-	fprintf(stderr, "%s\n", err);
-}
-
-/*
- * Logs current SDL error and returns false
- */
-int sdl_error(const char str[])
-{
-	log_error(str, SDL_GetError());
-	return 1;
-}
-
-/*
- * Starts up SDL and creates window
- */
 int renderer_Init()
 {
 	// initialize SDL
@@ -159,6 +136,47 @@ int renderer_Init()
 	return 0;
 }
 
+void renderer_Render()
+{
+	renderer_RenderGrid();
+	renderer_RenderFood();
+	for (int i = 0; i < SNAKELISTLEN; i++)
+		renderer_RenderSnake(i);
+	SDL_RenderPresent(g_renderer);
+	SDL_Delay(128);
+}
+
+/* private */
+
+struct vector topleft_position(int square_id)
+{
+	int id = square_id % g_maxpos;
+	int w = g_width - 2;
+	int x = (id % w) * g_square + g_square;
+	int y = (id / w) * g_square + g_square;
+	struct vector v = {x, y};
+	return v;
+}
+
+void log_error(const char str[], const char err[])
+{
+	fprintf(stderr, "ERROR: %s!\n", str);
+	fprintf(stderr, "%s\n", err);
+}
+
+int sdl_error(const char str[])
+{
+	log_error(str, SDL_GetError());
+	return 1;
+}
+
+void renderer_RenderFood()
+{
+	SDL_Rect rect = get_rect(g_food);
+	SDL_SetRenderDrawColor(g_renderer, 0xFF, 0x00, 0x00, 0xFF);
+	SDL_RenderFillRect(g_renderer, &rect);
+}
+
 void renderer_RenderGrid()
 {
 	// clear screen
@@ -183,23 +201,21 @@ void renderer_RenderGrid()
 	}
 }
 
-void renderer_Render()
+void renderer_RenderSnake(int id)
 {
-	SDL_RenderPresent(g_renderer);
-	SDL_Delay(128);
-}
-
-void renderer_Close()
-{
-	if (g_renderer) {
-		SDL_DestroyRenderer(g_renderer);
-		g_renderer = NULL;
+	struct snake *s = g_snakelist[id];
+	struct snake_tail *current = s->head;
+	while (current) {
+		SDL_Rect rect = get_rect(current->position);
+		if (id == g_selected)
+			SDL_SetRenderDrawColor(
+					g_renderer, 0xFF, 0xFF, 0x00, 0xFF);
+		else
+			SDL_SetRenderDrawColor(
+					g_renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+		SDL_RenderFillRect(g_renderer, &rect);
+		current = current->next;
 	}
-	if (g_window) {
-		SDL_DestroyWindow(g_window);
-		g_window = NULL;
-	}
-	SDL_Quit();
 }
 
 SDL_Rect get_rect(int square_id)

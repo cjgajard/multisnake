@@ -1,14 +1,15 @@
 #include <stdio.h>
 #include <stdbool.h>
-// #include <stdlib.h>
-// #include <time.h>
+#include <stdlib.h>
+#include <time.h>
 #include "game.h"
 #include "movement.h"
 
 int SCREEN_WIDTH, SCREEN_HEIGHT;
-struct snake *g_snakelist[1];
+struct snake *g_snakelist[SNAKELISTLEN];
 int g_width, g_height, g_maxpos, g_square;
 int g_selected;
+int g_food;
 
 void game_Init(int width)
 {
@@ -20,12 +21,13 @@ void game_Init(int width)
 	g_maxpos = (g_width - 2) * (g_height - 2);
 	g_selected = -1;
 
-	// srand(time(NULL));
-	g_snakelist[0] = snake_New(/*direction, position*/);
+	srand(time(NULL));
+	g_food = rand() % (g_maxpos + 1);
 
+	g_snakelist[0] = snake_New(/*direction, position*/);
 	for (int i = 0, l = 2; i < l; i++) {
+		g_snakelist[0]->grow = 1;
 		snake_Update(g_snakelist[0]);
-		snake_Append(g_snakelist[0]);
 	}
 }
 
@@ -45,5 +47,12 @@ void game_InputTurn(enum directive d)
 {
 	if (g_selected < 0)
 		return;
+	if (!g_snakelist[g_selected])
+		return;
 	g_snakelist[g_selected]->directive = d;
+}
+
+void game_UpdateFood()
+{
+	g_food = rand() % (g_maxpos + 1);
 }

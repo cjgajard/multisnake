@@ -15,10 +15,11 @@ struct snake_tail {
 struct snake {
 	struct snake_tail *head;
 	enum directive directive;
+	int grow;
 };
 
 struct snake *snake_New(void);
-void snake_Append(struct snake *s);
+void snake_Append(struct snake *s, int x);
 void snake_Destroy(struct snake *s);
 void snake_Update(struct snake *s);
 #endif

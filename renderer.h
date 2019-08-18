@@ -7,9 +7,10 @@
 #define EVENTNONE 0
 
 int renderer_Event();
+/*
+ * Starts up SDL and creates window
+ */
 int renderer_Init();
 void renderer_Close();
 void renderer_Render();
-void renderer_RenderGrid();
-void renderer_RenderSnake(int id, struct snake *s);
 #endif
