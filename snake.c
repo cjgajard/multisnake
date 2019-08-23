@@ -44,6 +44,34 @@ void snake_Update(struct snake *s)
 	s->grow = 0;
 }
 
+bool snake_Ouroboros(struct snake *s)
+{
+	int p = s->head->position;
+	struct snake_tail *t = s->head->next;
+	while (t) {
+		if (t->position == p)
+			return 1;
+		t = t->next;
+	}
+	return 0;
+}
+
+bool snake_EatMap(struct snake *s)
+{
+	return 0;
+}
+
+bool snake_EatSnake(struct snake *s, struct snake *s2)
+{
+	return 0;
+}
+
+bool snake_Eat(struct snake *s, int food)
+{
+	s->grow = s->head->position == food;
+	return (bool)s->grow;
+}
+
 /* private */
 
 void move_tail(struct snake_tail *t, enum direction n, int grow)

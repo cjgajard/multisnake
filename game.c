@@ -10,6 +10,8 @@ struct snake *g_snakelist[SNAKELISTLEN];
 int g_width, g_height, g_maxpos, g_square;
 int g_selected;
 int g_food;
+int g_score;
+bool g_gameover = false;
 
 void game_Init(int width)
 {
@@ -20,12 +22,13 @@ void game_Init(int width)
 	g_height = SCREEN_HEIGHT / g_square;
 	g_maxpos = (g_width - 2) * (g_height - 2);
 	g_selected = -1;
+	g_score = 0;
 
 	srand(time(NULL));
 	g_food = rand() % (g_maxpos + 1);
 
 	g_snakelist[0] = snake_New(/*direction, position*/);
-	for (int i = 0, l = 2; i < l; i++) {
+	for (int i = 0, l = 4; i < l; i++) {
 		g_snakelist[0]->grow = 1;
 		snake_Update(g_snakelist[0]);
 	}
@@ -55,4 +58,5 @@ void game_InputTurn(enum directive d)
 void game_UpdateFood()
 {
 	g_food = rand() % (g_maxpos + 1);
+	g_score += 1;
 }

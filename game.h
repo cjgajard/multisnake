@@ -1,5 +1,6 @@
 #ifndef GAME_H
 #define GAME_H
+#include <stdbool.h>
 #include "snake.h"
 #define SNAKELISTLEN 1
 
@@ -19,6 +20,10 @@ extern struct snake *g_snakelist[SNAKELISTLEN];
 extern int g_selected;
 
 extern int g_food;
+
+extern bool g_gameover;
+
+extern int g_score;
 
 /*
  * Initialize game variables.

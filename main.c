@@ -1,8 +1,4 @@
-#include <stdlib.h>
-#include <stdbool.h>
-#include "game.h"
-#include "movement.h"
-#include "snake.h"
+#include <stdio.h>
 #include "renderer.h"
 
 /*
@@ -10,30 +6,31 @@
  */
 int main(int argc, const char* args[])
 {
-	int quitflag = false;
 	int exitcode = 0; // $?
-	game_Init(32);
-
+	game_Init(16);
 	if (renderer_Init()) {
 		exitcode = 1;
-		quitflag = 1;
 	}
 
-	// main loop
-	while (!quitflag) {
+	while (!exitcode) {
 		if (renderer_Event() == EVENTQUIT)
 			break;
+		if (g_gameover)
+			continue;
+
 		for (int i = 0; i < SNAKELISTLEN; i++) {
 			struct snake *s = g_snakelist[i];
-			if (s->head->position == g_food) {
-				s->grow = 1;
+			if (snake_Eat(s, g_food))
 				game_UpdateFood();
-			}
 			snake_Update(s);
+			if (!g_gameover)
+				g_gameover = snake_Ouroboros(s);
 		}
 
 		renderer_Render();
 	}
+
+	printf("You scored %d points.\n", g_score);
 
 	renderer_Close();
 	return exitcode;
