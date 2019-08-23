@@ -23,7 +23,7 @@ struct msg {
 };
 
 static SDL_Window *window = NULL;
-static SDL_Surface *screen = NULL;
+// static SDL_Surface *screen = NULL;
 static SDL_Renderer *renderer = NULL;
 static TTF_Font *font_strong = NULL;
 static const SDL_Color white = {255, 255, 255};
@@ -135,11 +135,12 @@ int renderer_Init()
 			window, -1, SDL_RENDERER_ACCELERATED);
 	if (renderer == NULL)
 		return sdl_error("Renderer could not be created");
-	SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
 
-	screen = SDL_GetWindowSurface(window);
+	// screen = SDL_GetWindowSurface(window);
 
-	font_strong = TTF_OpenFont("assets/SourceSansPro-Regular.ttf", 48);
+	SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+
+	font_strong = TTF_OpenFont("assets/SourceSansPro-Regular.ttf", 24);
 	msg_gameover = msg_New(font_strong, "GAME OVER");
 	return 0;
 }
@@ -164,9 +165,8 @@ flush:
 struct vector topleft_position(int square_id)
 {
 	int id = square_id % g_maxpos;
-	int w = g_width - 2;
-	int x = (id % w) * g_square + g_square;
-	int y = (id / w) * g_square + g_square;
+	int x = (id % g_width) * g_square + g_square;
+	int y = (id / g_width) * g_square + g_square;
 	struct vector v = {x, y};
 	return v;
 }
@@ -192,23 +192,20 @@ void renderer_RenderFood()
 
 void renderer_RenderGrid()
 {
-	// clear screen
 	SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0xFF);
 	SDL_RenderClear(renderer);
-
 	SDL_SetRenderDrawColor(renderer, 0x40, 0x40, 0x40, 0xFF);
-	// SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
 
 	int zero = g_square;
 	int right = SCREEN_WIDTH - g_square;
 	int bottom = SCREEN_HEIGHT - g_square;
 
-	for (int i = 0; i < g_width; i++) {
+	for (int i = 0; i <= g_width; i++) {
 		int pos = g_square * (i + 1);
 		SDL_RenderDrawLine(renderer, pos, zero, pos, bottom);
 	}
 
-	for (int i = 0; i < g_height; i++) {
+	for (int i = 0; i <= g_height; i++) {
 		int pos = g_square * (i + 1);
 		SDL_RenderDrawLine(renderer, zero, pos, right, pos);
 	}
@@ -217,6 +214,8 @@ void renderer_RenderGrid()
 void renderer_RenderSnake(int id)
 {
 	struct snake *s = g_snakelist[id];
+	if (s == NULL)
+		return;
 	struct snake_tail *current = s->head;
 	while (current) {
 		SDL_Rect rect = get_rect(current->position);
@@ -233,28 +232,17 @@ void renderer_RenderSnake(int id)
 
 void renderer_GameOver()
 {
-	// int padding = 48;
-	int border = 4;
-	int w = SCREEN_WIDTH / 2 + 4;
-	int h = SCREEN_HEIGHT / 4 + 4;
+	int padding = 16;
+	int w = msg_gameover->w + padding * 2;
+	int h = msg_gameover->h + padding;
 	SDL_Rect rect = {
 		.x = (SCREEN_WIDTH - w) / 2,
 		.y = (SCREEN_HEIGHT - h) / 2,
-		.w = w,
-		.h = h
+		.w = w + 2,
+		.h = h + 2
 	};
-	SDL_SetRenderDrawColor(
-			renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+	SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0xCC);
 	SDL_RenderFillRect(renderer, &rect);
-
-	rect.x += border;
-	rect.y += border;
-	rect.w -= 2 * border;
-	rect.h -= 2 * border;
-	SDL_SetRenderDrawColor(
-			renderer, 0x00, 0x00, 0x00, 0xFF);
-	SDL_RenderFillRect(renderer, &rect);
-
 	msg_Render(msg_gameover, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
 }
 

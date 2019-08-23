@@ -2,7 +2,7 @@
 #define GAME_H
 #include <stdbool.h>
 #include "snake.h"
-#define SNAKELISTLEN 1
+#define SNAKELISTLEN 10
 
 /*
  * Screen dimensions
@@ -38,5 +38,5 @@ void game_InputSelect(int id);
 
 void game_InputTurn(enum directive d);
 
-void game_UpdateFood();
+void game_Eat();
 #endif

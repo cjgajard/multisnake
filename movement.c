@@ -9,7 +9,7 @@ int mod(int x, int N)
 
 int movement(int position, int direction)
 {
-	int w = g_width - 2;
+	int w = g_width;
 
 	switch (direction) {
 	case UP:

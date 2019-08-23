@@ -11,22 +11,25 @@ void move_tail(struct snake_tail *t, enum direction n, int grow);
 /*
  * Creates a new snake_tail
  */
-struct snake_tail *snake_tail_New(int x, int d)
+struct snake_tail *snake_tail_New(int n, enum direction d)
 {
-	struct snake_tail *t = malloc(sizeof(struct snake_tail));
+	struct snake_tail *t;
+	t = malloc(sizeof(*t));
 	t->next = NULL;
 	t->direction = d;
-	t->position = x;
+	t->position = n;
 	return t;
 }
 
 /* public */
 
-struct snake *snake_New()
+struct snake *snake_New(int n, enum direction d)
 {
 	struct snake *s = malloc(sizeof(struct snake));
 	s->directive = KEEP;
-	s->head = snake_tail_New(0, RIGHT);
+	s->head = snake_tail_New(n, d);
+	s->grow = 1;
+	snake_Update(s);
 	return s;
 }
 

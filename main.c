@@ -7,7 +7,7 @@
 int main(int argc, const char* args[])
 {
 	int exitcode = 0; // $?
-	game_Init(16);
+	game_Init(32);
 	if (renderer_Init()) {
 		exitcode = 1;
 	}
@@ -20,8 +20,10 @@ int main(int argc, const char* args[])
 
 		for (int i = 0; i < SNAKELISTLEN; i++) {
 			struct snake *s = g_snakelist[i];
+			if (!s)
+				continue;
 			if (snake_Eat(s, g_food))
-				game_UpdateFood();
+				game_Eat();
 			snake_Update(s);
 			if (!g_gameover)
 				g_gameover = snake_Ouroboros(s);

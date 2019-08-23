@@ -19,7 +19,7 @@ struct snake {
 	int grow;
 };
 
-struct snake *snake_New(void);
+struct snake *snake_New(int n, enum direction d);
 void snake_Append(struct snake *s, int x);
 void snake_Destroy(struct snake *s);
 void snake_Update(struct snake *s);
