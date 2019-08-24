@@ -1,5 +1,3 @@
-#include <stdio.h>
-#include <stdbool.h>
 #include <stdlib.h>
 #include <time.h>
 #include "game.h"
@@ -12,8 +10,7 @@ int g_selected;
 int g_food;
 int g_score;
 bool g_gameover = false;
-
-void game_UpdateFood();
+static void game_UpdateFood();
 
 /* public */
 
@@ -64,7 +61,7 @@ void game_Eat()
 
 /* private */
 
-void game_UpdateFood()
+static void game_UpdateFood()
 {
 	g_food = rand() % (g_maxpos + 1);
 }

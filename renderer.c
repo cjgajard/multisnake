@@ -25,6 +25,7 @@ struct msg {
 static SDL_Window *window = NULL;
 // static SDL_Surface *screen = NULL;
 static SDL_Renderer *renderer = NULL;
+static TTF_Font *font_regular = NULL;
 static TTF_Font *font_strong = NULL;
 static const SDL_Color white = {255, 255, 255};
 static struct msg *msg_gameover = NULL;
@@ -46,10 +47,11 @@ static SDL_Rect get_rect(int square_id);
  * of a square.
  */
 static struct vector topleft_position(int square_id);
-static void renderer_RenderGrid();
-static void renderer_RenderSnake(int id);
 static void renderer_RenderFood();
-static void renderer_GameOver();
+static void renderer_RenderGameOver();
+static void renderer_RenderGrid();
+static void renderer_RenderScore();
+static void renderer_RenderSnake(int id);
 static struct msg *msg_New(TTF_Font *f, const char *str);
 static void msg_Destroy(struct msg *t);
 static void msg_Render(struct msg *t, int x, int y);
@@ -69,6 +71,10 @@ void renderer_Close()
 	if (font_strong) {
 		TTF_CloseFont(font_strong);
 		font_strong = NULL;
+	}
+	if (font_regular) {
+		TTF_CloseFont(font_regular);
+		font_regular = NULL;
 	}
 	if (msg_gameover)
 		msg_Destroy(msg_gameover);
@@ -122,12 +128,12 @@ int renderer_Init()
 	}
 
 	window = SDL_CreateWindow(
-			"SDL Tutorial",
+			NULL,
 			SDL_WINDOWPOS_UNDEFINED,
 			SDL_WINDOWPOS_UNDEFINED,
 			SCREEN_WIDTH,
 			SCREEN_HEIGHT,
-			SDL_WINDOW_SHOWN);
+			SDL_WINDOW_SHOWN | SDL_WINDOW_BORDERLESS);
 	if (window == NULL)
 		return sdl_error("Window could not be created");
 
@@ -140,7 +146,8 @@ int renderer_Init()
 
 	SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 
-	font_strong = TTF_OpenFont("assets/SourceSansPro-Regular.ttf", 24);
+	font_regular = TTF_OpenFont("assets/SourceSansPro-Regular.ttf", 14);
+	font_strong = TTF_OpenFont("assets/SourceSansPro-Regular.ttf", 28);
 	msg_gameover = msg_New(font_strong, "GAME OVER");
 	return 0;
 }
@@ -148,13 +155,14 @@ int renderer_Init()
 void renderer_Render()
 {
 	if (g_gameover) {
-		renderer_GameOver();
+		renderer_RenderGameOver();
 		goto flush;
 	}
 	renderer_RenderGrid();
 	renderer_RenderFood();
 	for (int i = 0; i < SNAKELISTLEN; i++)
 		renderer_RenderSnake(i);
+	renderer_RenderScore();
 flush:
 	SDL_RenderPresent(renderer);
 	SDL_Delay(128);
@@ -230,7 +238,16 @@ void renderer_RenderSnake(int id)
 	}
 }
 
-void renderer_GameOver()
+static void renderer_RenderScore()
+{
+	char str[64];
+	sprintf(str, "SCORE %03d", g_score);
+	struct msg *score = msg_New(font_regular, str);
+	msg_Render(score, score->w / 2 + g_square, score->h / 2);
+	msg_Destroy(score);
+}
+
+void renderer_RenderGameOver()
 {
 	int padding = 16;
 	int w = msg_gameover->w + padding * 2;

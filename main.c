@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include "renderer.h"
 
 /*
@@ -31,8 +30,6 @@ int main(int argc, const char* args[])
 
 		renderer_Render();
 	}
-
-	printf("You scored %d points.\n", g_score);
 
 	renderer_Close();
 	return exitcode;
