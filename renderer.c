@@ -22,12 +22,17 @@ struct msg {
 	int h;
 };
 
-static SDL_Window *window = NULL;
-// static SDL_Surface *screen = NULL;
 static SDL_Renderer *renderer = NULL;
+static SDL_Window *window = NULL;
 static TTF_Font *font_regular = NULL;
 static TTF_Font *font_strong = NULL;
 static const SDL_Color white = {255, 255, 255};
+/*
+ * Size in pixels of each square.
+ */
+static int g_square;
+static int screen_width;
+static int screen_height;
 static struct msg *msg_gameover = NULL;
 
 /*
@@ -118,7 +123,7 @@ int renderer_Event()
 	return EVENTNONE;
 }
 
-int renderer_Init()
+int renderer_Init(int w, int h, int sqr)
 {
 	if (SDL_Init(SDL_INIT_VIDEO) < 0)
 		return sdl_error("SDL could not initialize");
@@ -127,12 +132,16 @@ int renderer_Init()
 		return 2;
 	}
 
+	screen_width = w;
+	screen_height = h;
+	g_square = sqr;
+
 	window = SDL_CreateWindow(
 			NULL,
 			SDL_WINDOWPOS_UNDEFINED,
 			SDL_WINDOWPOS_UNDEFINED,
-			SCREEN_WIDTH,
-			SCREEN_HEIGHT,
+			screen_width,
+			screen_height,
 			SDL_WINDOW_SHOWN | SDL_WINDOW_BORDERLESS);
 	if (window == NULL)
 		return sdl_error("Window could not be created");
@@ -141,10 +150,9 @@ int renderer_Init()
 			window, -1, SDL_RENDERER_ACCELERATED);
 	if (renderer == NULL)
 		return sdl_error("Renderer could not be created");
+	SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 
 	// screen = SDL_GetWindowSurface(window);
-
-	SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 
 	font_regular = TTF_OpenFont("assets/SourceSansPro-Regular.ttf", 14);
 	font_strong = TTF_OpenFont("assets/SourceSansPro-Regular.ttf", 28);
@@ -205,8 +213,8 @@ void renderer_RenderGrid()
 	SDL_SetRenderDrawColor(renderer, 0x40, 0x40, 0x40, 0xFF);
 
 	int zero = g_square;
-	int right = SCREEN_WIDTH - g_square;
-	int bottom = SCREEN_HEIGHT - g_square;
+	int right = screen_width - g_square;
+	int bottom = screen_height - g_square;
 
 	for (int i = 0; i <= g_width; i++) {
 		int pos = g_square * (i + 1);
@@ -253,14 +261,14 @@ void renderer_RenderGameOver()
 	int w = msg_gameover->w + padding * 2;
 	int h = msg_gameover->h + padding;
 	SDL_Rect rect = {
-		.x = (SCREEN_WIDTH - w) / 2,
-		.y = (SCREEN_HEIGHT - h) / 2,
+		.x = (screen_width - w) / 2,
+		.y = (screen_height - h) / 2,
 		.w = w + 2,
 		.h = h + 2
 	};
 	SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0xCC);
 	SDL_RenderFillRect(renderer, &rect);
-	msg_Render(msg_gameover, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
+	msg_Render(msg_gameover, screen_width / 2, screen_height / 2);
 }
 
 SDL_Rect get_rect(int square_id)

@@ -3,26 +3,22 @@
 #include "game.h"
 #include "movement.h"
 
-int SCREEN_WIDTH, SCREEN_HEIGHT;
-struct snake *g_snakelist[SNAKELISTLEN];
-int g_width, g_height, g_maxpos, g_square;
-int g_selected;
-int g_food;
-int g_score;
 bool g_gameover = false;
+int g_food, g_poison;
+int g_score;
+int g_selected;
+int g_width, g_height, g_maxpos;
+struct snake *g_snakelist[SNAKELISTLEN];
+
 static void game_UpdateFood();
 
 /* public */
 
-void game_Init(int width)
+void game_Init(int width, int height)
 {
 	srand(time(NULL));
-
-	SCREEN_WIDTH = 640;
-	SCREEN_HEIGHT = 480;
-	g_square = SCREEN_WIDTH / width;
 	g_width = width - 2;
-	g_height = SCREEN_HEIGHT / g_square - 2;
+	g_height = height - 2;
 	g_maxpos = g_width * g_height;
 	g_selected = -1;
 	g_score = 0;

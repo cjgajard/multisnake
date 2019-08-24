@@ -7,7 +7,7 @@
 #define EVENTNONE 0
 
 int renderer_Event();
-int renderer_Init();
+int renderer_Init(int w, int h, int sqr);
 void renderer_Close();
 void renderer_Render();
 #endif
