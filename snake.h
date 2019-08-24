@@ -16,13 +16,16 @@ struct snake_tail {
 struct snake {
 	struct snake_tail *head;
 	enum directive directive;
-	int grow;
+	bool grow;
+	int length;
 };
 
-struct snake *snake_New(int n, enum direction d);
-void snake_Append(struct snake *s, int x);
-void snake_Destroy(struct snake *s);
-void snake_Update(struct snake *s);
-bool snake_Eat(struct snake *s, int food);
-bool snake_Ouroboros(struct snake *s);
+struct snake *snake_Create (int n, enum direction d);
+struct snake *snake_New (void);
+bool snake_Ouroboros (struct snake *this);
+void snake_Destroy (struct snake *this);
+void snake_OnFood (struct snake *this);
+void snake_OnPoison (struct snake *this);
+void snake_Turn (struct snake *this, enum directive d);
+void snake_Update (struct snake *this);
 #endif

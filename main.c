@@ -21,18 +21,7 @@ int main(int argc, const char* args[])
 			break;
 		if (g_gameover)
 			continue;
-
-		for (int i = 0; i < SNAKELISTLEN; i++) {
-			struct snake *s = g_snakelist[i];
-			if (!s)
-				continue;
-			if (snake_Eat(s, g_food))
-				game_Eat();
-			snake_Update(s);
-			if (!g_gameover)
-				g_gameover = snake_Ouroboros(s);
-		}
-
+		game_Update();
 		renderer_Render();
 	}
 

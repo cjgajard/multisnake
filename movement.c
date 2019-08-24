@@ -1,13 +1,13 @@
 #include "movement.h"
 
-int mod(int x, int N)
+int mod (int x, int N)
 {
 	int r = x % N;
 	return r < 0 ? r + N : r;
 	// return (x % N + N) % N;
 }
 
-int movement(int position, int direction)
+int movement (int position, int direction)
 {
 	int w = g_width;
 
@@ -25,7 +25,7 @@ int movement(int position, int direction)
 	}
 }
 
-int turn(int direction, int directive)
+int turn (int direction, int directive)
 {
 	switch (directive) {
 	case PORT:

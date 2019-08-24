@@ -6,8 +6,8 @@
 #define EVENTQUIT -1
 #define EVENTNONE 0
 
-int renderer_Event();
-int renderer_Init(int w, int h, int sqr);
-void renderer_Close();
-void renderer_Render();
+int renderer_Event (void);
+int renderer_Init (int w, int h, int sqr);
+void renderer_Close (void);
+void renderer_Render (void);
 #endif

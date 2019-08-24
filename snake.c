@@ -1,15 +1,11 @@
+#include <stdio.h>
 #include <stdlib.h>
 #include "snake.h"
 
 /*
- * Updates the position of a snake point
- */
-void move_tail(struct snake_tail *t, enum direction n, int grow);
-
-/*
  * Creates a new snake_tail
  */
-struct snake_tail *snake_tail_New(int n, enum direction d)
+struct snake_tail *snake_tail_New (int n, enum direction d)
 {
 	struct snake_tail *t;
 	t = malloc(sizeof(*t));
@@ -21,67 +17,67 @@ struct snake_tail *snake_tail_New(int n, enum direction d)
 
 /* public */
 
-struct snake *snake_New(int n, enum direction d)
+struct snake *snake_Create (int n, enum direction d)
 {
-	struct snake *s = malloc(sizeof(struct snake));
-	s->directive = KEEP;
-	s->head = snake_tail_New(n, d);
-	s->grow = 1;
-	snake_Update(s);
-	return s;
+	struct snake *this = snake_New();
+	this->head = snake_tail_New(n, d);
+	this->grow = true;
+	this->length += 1;
+	return this;
 }
 
-void snake_Turn(struct snake *s, enum directive d)
+struct snake *snake_New ()
 {
-	s->directive = d;
+	struct snake *this = malloc(sizeof(struct snake));
+	this->directive = KEEP;
+	this->grow = false;
+	this->length = 0;
+	return this;
 }
 
-void snake_Update(struct snake *s)
+void snake_Turn (struct snake *this, enum directive d)
 {
-	struct snake_tail *h = (struct snake_tail *)s->head;
-	enum direction d = turn(h->direction, s->directive);
-	s->directive = KEEP;
-	move_tail(h, d, s->grow);
-	s->grow = 0;
+	this->directive = d;
 }
 
-bool snake_Ouroboros(struct snake *s)
+void snake_Update (struct snake *this)
 {
-	int p = s->head->position;
-	struct snake_tail *t = s->head->next;
+	struct snake_tail **indirect = &this->head;
+	enum direction nd = turn((*indirect)->direction, this->directive);
+	int x;
+	// int i = 0;
+	// int l = this->length / 2;
+
+	while (*indirect) {
+		x = (*indirect)->position;
+		enum direction d = (*indirect)->direction;
+		(*indirect)->position = movement(x, d);
+		(*indirect)->direction = nd;
+		nd = d;
+		indirect = &(*indirect)->next;
+	}
+
+	if (this->grow)
+		*indirect = snake_tail_New(x, nd);
+
+	this->length += (int)this->grow;
+	this->directive = KEEP;
+	this->grow = false;
+}
+
+void snake_OnFood (struct snake *this)
+{
+	this->grow = true;
+}
+
+bool snake_Ouroboros (struct snake *this)
+{
+	int p = this->head->position;
+	struct snake_tail *t = this->head->next;
 	while (t) {
 		if (t->position == p)
-			return 1;
+			return true;
 		t = t->next;
 	}
-	return 0;
-}
-
-bool snake_EatMap(struct snake *s)
-{
-	return 0;
-}
-
-bool snake_EatSnake(struct snake *s, struct snake *s2)
-{
-	return 0;
-}
-
-bool snake_Eat(struct snake *s, int food)
-{
-	s->grow = s->head->position == food;
-	return (bool)s->grow;
-}
-
-/* private */
-
-void move_tail(struct snake_tail *t, enum direction n, int grow)
-{
-	int p = t->position;
-	t->position = movement(p, t->direction);
-	if (t->next)
-		move_tail(t->next, t->direction, grow);
-	else if (grow)
-		t->next = snake_tail_New(p, t->direction);
-	t->direction = n;
+	return false;
 }

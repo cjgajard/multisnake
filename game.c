@@ -4,13 +4,14 @@
 #include "movement.h"
 
 bool g_gameover = false;
-int g_food, g_poison;
+int g_food;
 int g_score;
 int g_selected;
 int g_width, g_height, g_maxpos;
 struct snake *g_snakelist[SNAKELISTLEN];
 
 static void game_UpdateFood();
+static void game_Eat();
 
 /* public */
 
@@ -25,7 +26,7 @@ void game_Init(int width, int height)
 	game_UpdateFood();
 	for (int i = 0; i < SNAKELISTLEN; i++)
 		g_snakelist[i] = NULL;
-	g_snakelist[0] = snake_New((g_maxpos + g_width) / 2 - 1, RIGHT);
+	g_snakelist[0] = snake_Create((g_maxpos + g_width) / 2 - 1, RIGHT);
 }
 
 void game_InputMove(enum direction d)
@@ -42,17 +43,33 @@ void game_InputSelect(int id)
 
 void game_InputTurn(enum directive d)
 {
-	if (g_selected < 0)
+	if (g_selected < 0 || g_selected >= SNAKELISTLEN)
 		return;
 	if (!g_snakelist[g_selected])
 		return;
-	g_snakelist[g_selected]->directive = d;
+	snake_Turn(g_snakelist[g_selected], d);
 }
 
 void game_Eat()
 {
 	g_score += 1;
 	game_UpdateFood();
+}
+
+void game_Update()
+{
+	for (int i = 0; i < SNAKELISTLEN; i++) {
+		struct snake *s = g_snakelist[i];
+		if (!s)
+			continue;
+		if (s->head->position == g_food) {
+			snake_OnFood(s);
+			game_Eat();
+		}
+		snake_Update(s);
+		if (!g_gameover)
+			g_gameover = snake_Ouroboros(s);
+	}
 }
 
 /* private */

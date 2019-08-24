@@ -28,10 +28,10 @@ extern int g_maxpos;
 /*
  * Returns the new position after moving in one direction
  */
-int movement(int position, int direction);
+int movement (int position, int direction);
 
 /*
  * Returns the new direction after turning in +-90 degrees.
  */
-int turn(int direction, int directive);
+int turn (int direction, int directive);
 #endif

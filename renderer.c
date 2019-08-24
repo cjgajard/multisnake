@@ -38,32 +38,32 @@ static struct msg *msg_gameover = NULL;
 /*
  * Prints an error message to stderr
  */
-static void log_error(const char str[], const char err[]);
+static void log_error (const char str[], const char err[]);
 /*
  * Logs current SDL error and returns false
  */
-static int sdl_error(const char str[]);
+static int sdl_error (const char str[]);
 /*
  * Returns a SDL rectangle representing a square with position and dimentions.
  */
-static SDL_Rect get_rect(int square_id);
+static SDL_Rect get_rect (int square_id);
 /*
  * Returns a vector with the distance from the origin of the top-left corner
  * of a square.
  */
-static struct vector topleft_position(int square_id);
-static void renderer_RenderFood();
-static void renderer_RenderGameOver();
-static void renderer_RenderGrid();
-static void renderer_RenderScore();
-static void renderer_RenderSnake(int id);
-static struct msg *msg_New(TTF_Font *f, const char *str);
-static void msg_Destroy(struct msg *t);
-static void msg_Render(struct msg *t, int x, int y);
+static struct vector topleft_position (int square_id);
+static void renderer_RenderFood ();
+static void renderer_RenderGameOver ();
+static void renderer_RenderGrid ();
+static void renderer_RenderScore ();
+static void renderer_RenderSnake (int id);
+static struct msg *msg_New (TTF_Font *f, const char *str);
+static void msg_Destroy (struct msg *t);
+static void msg_Render (struct msg *t, int x, int y);
 
 /* public */
 
-void renderer_Close()
+void renderer_Close ()
 {
 	if (renderer) {
 		SDL_DestroyRenderer(renderer);
@@ -86,7 +86,7 @@ void renderer_Close()
 	SDL_Quit();
 }
 
-int renderer_Event()
+int renderer_Event ()
 {
 	SDL_Event e;
 
@@ -123,7 +123,7 @@ int renderer_Event()
 	return EVENTNONE;
 }
 
-int renderer_Init(int w, int h, int sqr)
+int renderer_Init (int w, int h, int sqr)
 {
 	if (SDL_Init(SDL_INIT_VIDEO) < 0)
 		return sdl_error("SDL could not initialize");
@@ -160,7 +160,7 @@ int renderer_Init(int w, int h, int sqr)
 	return 0;
 }
 
-void renderer_Render()
+void renderer_Render ()
 {
 	if (g_gameover) {
 		renderer_RenderGameOver();
@@ -178,7 +178,7 @@ flush:
 
 /* private */
 
-struct vector topleft_position(int square_id)
+struct vector topleft_position (int square_id)
 {
 	int id = square_id % g_maxpos;
 	int x = (id % g_width) * g_square + g_square;
@@ -187,26 +187,26 @@ struct vector topleft_position(int square_id)
 	return v;
 }
 
-void log_error(const char str[], const char err[])
+void log_error (const char str[], const char err[])
 {
 	fprintf(stderr, "ERROR: %s!\n", str);
 	fprintf(stderr, "%s\n", err);
 }
 
-int sdl_error(const char str[])
+int sdl_error (const char str[])
 {
 	log_error(str, SDL_GetError());
 	return 1;
 }
 
-void renderer_RenderFood()
+void renderer_RenderFood ()
 {
 	SDL_Rect rect = get_rect(g_food);
 	SDL_SetRenderDrawColor(renderer, 0xFF, 0x00, 0x00, 0xFF);
 	SDL_RenderFillRect(renderer, &rect);
 }
 
-void renderer_RenderGrid()
+void renderer_RenderGrid ()
 {
 	SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0xFF);
 	SDL_RenderClear(renderer);
@@ -227,7 +227,7 @@ void renderer_RenderGrid()
 	}
 }
 
-void renderer_RenderSnake(int id)
+void renderer_RenderSnake (int id)
 {
 	struct snake *s = g_snakelist[id];
 	if (s == NULL)
@@ -246,7 +246,7 @@ void renderer_RenderSnake(int id)
 	}
 }
 
-static void renderer_RenderScore()
+static void renderer_RenderScore ()
 {
 	char str[64];
 	sprintf(str, "SCORE %03d", g_score);
@@ -255,7 +255,7 @@ static void renderer_RenderScore()
 	msg_Destroy(score);
 }
 
-void renderer_RenderGameOver()
+void renderer_RenderGameOver ()
 {
 	int padding = 16;
 	int w = msg_gameover->w + padding * 2;
@@ -271,14 +271,14 @@ void renderer_RenderGameOver()
 	msg_Render(msg_gameover, screen_width / 2, screen_height / 2);
 }
 
-SDL_Rect get_rect(int square_id)
+SDL_Rect get_rect (int square_id)
 {
 	struct vector v = topleft_position(square_id);
 	SDL_Rect rekt = {v.x + 2, v.y + 1, g_square - 2, g_square - 1};
 	return rekt;
 }
 
-static struct msg *msg_New(TTF_Font *f, const char *str)
+struct msg *msg_New (TTF_Font *f, const char *str)
 {
 	int w, h;
 	struct msg *t;
@@ -295,14 +295,14 @@ static struct msg *msg_New(TTF_Font *f, const char *str)
 	return t;
 }
 
-static void msg_Destroy(struct msg *t)
+void msg_Destroy (struct msg *t)
 {
 	SDL_DestroyTexture(t->t);
 	free(t);
 	t = NULL;
 }
 
-static void msg_Render(struct msg *t, int x, int y)
+void msg_Render (struct msg *t, int x, int y)
 {
 	SDL_Rect r = {
 		.x = x - t->w / 2,
