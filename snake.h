@@ -20,12 +20,12 @@ struct snake {
 	int length;
 };
 
+bool snake_Ouroboros (struct snake *this);
 struct snake *snake_Create (int n, enum direction d);
 struct snake *snake_New (void);
-bool snake_Ouroboros (struct snake *this);
+struct snake *snake_OnPoison (struct snake *this);
 void snake_Destroy (struct snake *this);
 void snake_OnFood (struct snake *this);
-void snake_OnPoison (struct snake *this);
 void snake_Turn (struct snake *this, enum directive d);
 void snake_Update (struct snake *this);
 #endif

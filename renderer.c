@@ -108,6 +108,10 @@ int renderer_Event ()
 			case SDLK_u:
 				game_InputTurn(STARBOARD);
 				break;
+			case SDLK_0:
+			case SDLK_KP_0:
+				game_InputSelect(9);
+				break;
 			case SDLK_1:
 			case SDLK_KP_1:
 				game_InputSelect(0);
@@ -115,6 +119,34 @@ int renderer_Event ()
 			case SDLK_2:
 			case SDLK_KP_2:
 				game_InputSelect(1);
+				break;
+			case SDLK_3:
+			case SDLK_KP_3:
+				game_InputSelect(2);
+				break;
+			case SDLK_4:
+			case SDLK_KP_4:
+				game_InputSelect(3);
+				break;
+			case SDLK_5:
+			case SDLK_KP_5:
+				game_InputSelect(4);
+				break;
+			case SDLK_6:
+			case SDLK_KP_6:
+				game_InputSelect(5);
+				break;
+			case SDLK_7:
+			case SDLK_KP_7:
+				game_InputSelect(6);
+				break;
+			case SDLK_8:
+			case SDLK_KP_8:
+				game_InputSelect(7);
+				break;
+			case SDLK_9:
+			case SDLK_KP_9:
+				game_InputSelect(8);
 				break;
 			}
 		}
@@ -202,7 +234,10 @@ int sdl_error (const char str[])
 void renderer_RenderFood ()
 {
 	SDL_Rect rect = get_rect(g_food);
-	SDL_SetRenderDrawColor(renderer, 0xFF, 0x00, 0x00, 0xFF);
+	if (g_poison)
+		SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0xFF, 0xFF);
+	else
+		SDL_SetRenderDrawColor(renderer, 0xFF, 0x00, 0x00, 0xFF);
 	SDL_RenderFillRect(renderer, &rect);
 }
 

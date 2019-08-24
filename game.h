@@ -5,9 +5,11 @@
 #define SNAKELISTLEN 10
 
 extern bool g_gameover;
+extern bool g_poison;
 extern int g_food;
 extern int g_score;
 extern int g_selected;
+extern int g_snakelist_count;
 extern struct snake *g_snakelist[SNAKELISTLEN];
 
 void game_Close (void);

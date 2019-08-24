@@ -17,6 +17,18 @@ struct snake_tail *snake_tail_New (int n, enum direction d)
 
 /* public */
 
+bool snake_Ouroboros (struct snake *this)
+{
+	int p = this->head->position;
+	struct snake_tail *t = this->head->next;
+	while (t) {
+		if (t->position == p)
+			return true;
+		t = t->next;
+	}
+	return false;
+}
+
 struct snake *snake_Create (int n, enum direction d)
 {
 	struct snake *this = snake_New();
@@ -35,6 +47,50 @@ struct snake *snake_New ()
 	return this;
 }
 
+void snake_Destroy (struct snake *this)
+{
+	struct snake_tail *t = this->head;
+	while (t) {
+		struct snake_tail *n = t->next;
+		free(t);
+		t = n;
+	}
+	free(this);
+}
+
+void snake_OnFood (struct snake *this)
+{
+	this->grow = true;
+}
+
+struct snake *snake_OnPoison (struct snake *this)
+{
+	struct snake_tail *t = this->head;
+	int i = 1;
+	int l = this->length / 2;
+
+	while (t) {
+		if (i >= l)
+			break;
+		t = t->next;
+		i++;
+	}
+
+	if (!t) {
+		printf("error t null\n");
+		return NULL;
+	}
+
+	if (!t->next)
+		printf("error t->next is null\n");
+	struct snake *s = snake_New();
+	s->head = t->next;
+	s->length = this->length - l;
+	t->next = NULL;
+	this->length = l;
+	return s;
+}
+
 void snake_Turn (struct snake *this, enum directive d)
 {
 	this->directive = d;
@@ -45,8 +101,6 @@ void snake_Update (struct snake *this)
 	struct snake_tail **indirect = &this->head;
 	enum direction nd = turn((*indirect)->direction, this->directive);
 	int x;
-	// int i = 0;
-	// int l = this->length / 2;
 
 	while (*indirect) {
 		x = (*indirect)->position;
@@ -63,21 +117,4 @@ void snake_Update (struct snake *this)
 	this->length += (int)this->grow;
 	this->directive = KEEP;
 	this->grow = false;
-}
-
-void snake_OnFood (struct snake *this)
-{
-	this->grow = true;
-}
-
-bool snake_Ouroboros (struct snake *this)
-{
-	int p = this->head->position;
-	struct snake_tail *t = this->head->next;
-	while (t) {
-		if (t->position == p)
-			return true;
-		t = t->next;
-	}
-	return false;
 }

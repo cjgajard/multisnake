@@ -25,6 +25,7 @@ int main(int argc, const char* args[])
 		renderer_Render();
 	}
 
+	game_Close();
 	renderer_Close();
 	return exitcode;
 }
