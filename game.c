@@ -4,9 +4,9 @@
 #include "game.h"
 #include "movement.h"
 
+#define POISON_PROBABILITY 0.25
 bool g_gameover;
 bool g_poison;
-const double poison_probability = 0.333333;
 int g_food;
 int g_score;
 int g_selected;
@@ -14,9 +14,11 @@ int g_width, g_height, g_maxpos;
 int g_snakelist_count;
 struct snake *g_snakelist[SNAKELISTLEN];
 
-// static bool chance (double probability);
+static bool chance (double probability);
+static bool check_collision (void);
 static void game_UpdateFood (void);
 static void game_OnEat (void);
+static void game_OnPoison (struct snake *s);
 
 /* public */
 
@@ -73,33 +75,36 @@ void game_Update ()
 		if (!s)
 			continue;
 		if (s->head->position == g_food) {
-			if (g_poison) {
-				if (g_snakelist_count < SNAKELISTLEN) {
-					struct snake *next = snake_OnPoison(s);
-					g_snakelist[g_snakelist_count++] = next;
-				}
-			}
-			else {
+			if (g_poison)
+				game_OnPoison(s);
+			else
 				snake_OnFood(s);
-			}
 			game_OnEat();
 		}
 		snake_Update(s);
-		if (!g_gameover)
-			g_gameover = snake_Ouroboros(s);
 	}
+	g_gameover = check_collision();
 }
 
 /* private */
 
-/*
 bool chance (double probability)
 {
 	if (!probability)
 		return false;
 	return rand() <= (int)(probability * RAND_MAX);
 }
-*/
+
+bool check_collision ()
+{
+	for (int i = 0; i < g_snakelist_count; i++) {
+		for (int j = 0; j < g_snakelist_count; j++) {
+			if (snake_Eats(g_snakelist[i], g_snakelist[j]))
+				return true;
+		}
+	}
+	return false;
+}
 
 void game_OnEat ()
 {
@@ -110,5 +115,15 @@ void game_OnEat ()
 void game_UpdateFood ()
 {
 	g_food = rand() % (g_maxpos + 1);
-	g_poison = g_score % 4 == 0;
+	g_poison = chance(POISON_PROBABILITY);
+}
+
+void game_OnPoison (struct snake *s)
+{
+	if (g_snakelist_count >= SNAKELISTLEN)
+		return;
+	struct snake *next = snake_OnPoison(s);
+	if (!next)
+		return;
+	g_snakelist[g_snakelist_count++] = next;
 }

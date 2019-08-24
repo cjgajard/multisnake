@@ -17,12 +17,16 @@ struct snake_tail *snake_tail_New (int n, enum direction d)
 
 /* public */
 
-bool snake_Ouroboros (struct snake *this)
+bool snake_Eats (struct snake *this, struct snake *other)
 {
-	int p = this->head->position;
-	struct snake_tail *t = this->head->next;
+	if (!this || !other)
+		return false;
+	int x = this->head->position;
+	struct snake_tail *t = other->head;
+	if (this == other)
+		t = t->next;
 	while (t) {
-		if (t->position == p)
+		if (t->position == x)
 			return true;
 		t = t->next;
 	}
@@ -76,13 +80,8 @@ struct snake *snake_OnPoison (struct snake *this)
 		i++;
 	}
 
-	if (!t) {
-		printf("error t null\n");
-		return NULL;
-	}
-
 	if (!t->next)
-		printf("error t->next is null\n");
+		return NULL;
 	struct snake *s = snake_New();
 	s->head = t->next;
 	s->length = this->length - l;

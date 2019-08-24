@@ -194,18 +194,15 @@ int renderer_Init (int w, int h, int sqr)
 
 void renderer_Render ()
 {
-	if (g_gameover) {
-		renderer_RenderGameOver();
-		goto flush;
-	}
 	renderer_RenderGrid();
 	renderer_RenderFood();
 	for (int i = 0; i < SNAKELISTLEN; i++)
 		renderer_RenderSnake(i);
 	renderer_RenderScore();
-flush:
+	if (g_gameover)
+		renderer_RenderGameOver();
 	SDL_RenderPresent(renderer);
-	SDL_Delay(128);
+	SDL_Delay(200);
 }
 
 /* private */

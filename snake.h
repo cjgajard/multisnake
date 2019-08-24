@@ -7,7 +7,6 @@
  * Stores a fraction of a snake string.
  */
 struct snake_tail {
-	// struct snake_tail *previous;
 	struct snake_tail *next;
 	enum direction direction;
 	int position;
@@ -20,7 +19,7 @@ struct snake {
 	int length;
 };
 
-bool snake_Ouroboros (struct snake *this);
+bool snake_Eats (struct snake *this, struct snake *other);
 struct snake *snake_Create (int n, enum direction d);
 struct snake *snake_New (void);
 struct snake *snake_OnPoison (struct snake *this);
