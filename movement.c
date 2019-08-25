@@ -1,9 +1,9 @@
 #include "movement.h"
 
-int mod (int x, int N)
+int mod (int n, int div)
 {
-	int r = x % N;
-	return r < 0 ? r + N : r;
+	int r = n % div;
+	return r < 0 ? r + div : r;
 	// return (x % N + N) % N;
 }
 

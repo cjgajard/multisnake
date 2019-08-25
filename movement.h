@@ -28,6 +28,9 @@ extern int g_height;
  */
 extern int g_maxpos;
 /*
+ */
+int mod (int n, int div);
+/*
  * Returns the new position after moving in one direction
  */
 struct vector movement (enum direction d, struct vector v);

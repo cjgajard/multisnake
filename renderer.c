@@ -98,6 +98,29 @@ int renderer_Event ()
 			case SDLK_u:
 				game_InputTurn(STARBOARD);
 				break;
+			case SDLK_w:
+			case SDLK_k:
+			case SDLK_UP:
+				game_InputMove(UP);
+				break;
+			case SDLK_d:
+			case SDLK_l:
+			case SDLK_RIGHT:
+				game_InputMove(RIGHT);
+				break;
+			case SDLK_s:
+			case SDLK_j:
+			case SDLK_DOWN:
+				game_InputMove(DOWN);
+				break;
+			case SDLK_a:
+			case SDLK_h:
+			case SDLK_LEFT:
+				game_InputMove(LEFT);
+				break;
+			case SDLK_TAB:
+				game_InputRotate(1);
+				break;
 			case SDLK_0:
 			case SDLK_KP_0:
 				game_InputSelect(9);

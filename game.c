@@ -15,6 +15,7 @@ struct snake *g_snakelist[SNAKELISTLEN];
 static bool chance (double probability);
 static bool check_collision (void);
 static bool check_border (void);
+static bool is_selection (void);
 static void game_UpdateFood (void);
 static void game_OnEat (void);
 static void game_OnPoison (struct snake *s);
@@ -49,6 +50,34 @@ void game_Init (int width, int height)
 
 void game_InputMove (enum direction d)
 {
+	if (!is_selection())
+		return;
+	enum direction now = g_snakelist[g_selected]->head->direction;
+	enum directive next;
+	switch (now - d) {
+	case -1:
+	case 3:
+		next = STARBOARD;
+		break;
+	case 1:
+	case -3:
+		next = PORT;
+		break;
+	default:
+		next = KEEP;
+		break;
+	}
+	snake_Turn(g_snakelist[g_selected], next);
+}
+
+void game_InputRotate (int dir)
+{
+	int x = dir > 0 ? 1 : -1;
+	int next = mod(g_selected + x, g_snakelist_count);
+	if (next >= 0 && next < sizeof(g_snakelist))
+		g_selected = next;
+	else
+		g_selected = -1;
 }
 
 void game_InputSelect (int id)
@@ -61,9 +90,7 @@ void game_InputSelect (int id)
 
 void game_InputTurn (enum directive d)
 {
-	if (g_selected < 0 || g_selected >= g_snakelist_count)
-		return;
-	if (!g_snakelist[g_selected])
+	if (!is_selection())
 		return;
 	snake_Turn(g_snakelist[g_selected], d);
 }
@@ -117,6 +144,16 @@ bool check_border ()
 	}
 	return false;
 }
+
+bool is_selection ()
+{
+	if (g_selected < 0 || g_selected >= g_snakelist_count)
+		return false;
+	if (!g_snakelist[g_selected])
+		return false;
+	return true;
+}
+
 void game_OnEat ()
 {
 	g_score += 1;
