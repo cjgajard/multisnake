@@ -20,6 +20,7 @@ struct snake {
 };
 
 bool snake_Eats (struct snake *this, struct snake *other);
+bool snake_InBorder (struct snake *this);
 struct snake *snake_Create (struct vector x, enum direction d);
 struct snake *snake_New (void);
 struct snake *snake_OnPoison (struct snake *this);

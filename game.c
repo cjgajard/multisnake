@@ -14,6 +14,7 @@ struct snake *g_snakelist[SNAKELISTLEN];
 
 static bool chance (double probability);
 static bool check_collision (void);
+static bool check_border (void);
 static void game_UpdateFood (void);
 static void game_OnEat (void);
 static void game_OnPoison (struct snake *s);
@@ -82,7 +83,7 @@ void game_Update ()
 		}
 		snake_Update(s);
 	}
-	g_gameover = check_collision();
+	g_gameover = check_collision() || check_border();
 }
 
 /* private */
@@ -105,6 +106,17 @@ bool check_collision ()
 	return false;
 }
 
+bool check_border ()
+{
+	for (int i = 0; i < g_snakelist_count; i++) {
+		struct snake *s = g_snakelist[i];
+		if (!s)
+			continue;
+		if (snake_InBorder(s))
+			return true;
+	}
+	return false;
+}
 void game_OnEat ()
 {
 	g_score += 1;

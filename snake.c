@@ -32,18 +32,16 @@ bool snake_Eats (struct snake *this, struct snake *other)
 	return false;
 }
 
-/*
-bool snake_OutOfBorders (struct snake *this)
+bool snake_InBorder (struct snake *this)
 {
-	struct snake_tail *t = this->head;
-	while (t) {
-		if (t->position == x)
-			return true;
-		t = t->next;
-	}
+	int x = this->head->position.x;
+	int y = this->head->position.y;
+	if (x <= 0 || x > g_width)
+		return true;
+	if (y <= 0 || y > g_height)
+		return true;
 	return false;
 }
-*/
 
 struct snake *snake_Create (struct vector x, enum direction d)
 {
