@@ -19,6 +19,7 @@ static SDL_Window *window = NULL;
 static TTF_Font *font_regular = NULL;
 static TTF_Font *font_strong = NULL;
 static const SDL_Color white = {255, 255, 255};
+static const SDL_Color black = {0, 0, 0};
 /*
  * Size in pixels of each square.
  */
@@ -44,7 +45,7 @@ static void renderer_RenderGameOver ();
 static void renderer_RenderGrid ();
 static void renderer_RenderScore ();
 static void renderer_RenderSnake (int id);
-static struct msg *msg_New (TTF_Font *f, const char *str);
+static struct msg *msg_New (TTF_Font *f, SDL_Color c, const char *str);
 static void msg_Destroy (struct msg *t);
 static void msg_Render (struct msg *t, int x, int y);
 
@@ -68,8 +69,10 @@ void renderer_Close ()
 		TTF_CloseFont(font_regular);
 		font_regular = NULL;
 	}
-	if (msg_gameover)
+	if (msg_gameover) {
 		msg_Destroy(msg_gameover);
+		msg_gameover = NULL;
+	}
 	SDL_Quit();
 }
 
@@ -175,7 +178,7 @@ int renderer_Init (int w, int h, int sqr)
 
 	font_regular = TTF_OpenFont("assets/SourceSansPro-Regular.ttf", 14);
 	font_strong = TTF_OpenFont("assets/SourceSansPro-Regular.ttf", 28);
-	msg_gameover = msg_New(font_strong, "GAME OVER");
+	msg_gameover = msg_New(font_strong, white, "GAME OVER");
 	return 0;
 }
 
@@ -264,13 +267,20 @@ void renderer_RenderSnake (int id)
 		SDL_RenderFillRect(renderer, &rect);
 		current = current->next;
 	}
+
+	SDL_Rect rect = get_rect(s->head->position);
+	char str[4];
+	sprintf(str, "%d", (id + 1) % 10);
+	struct msg *m = msg_New(font_regular, black, str);
+	msg_Render(m, rect.x + rect.w / 2 , rect.y + rect.h / 2);
+	msg_Destroy(m);
 }
 
 static void renderer_RenderScore ()
 {
-	char str[64];
+	char str[16];
 	sprintf(str, "SCORE %03d", g_score);
-	struct msg *score = msg_New(font_regular, str);
+	struct msg *score = msg_New(font_regular, white, str);
 	msg_Render(score, score->w / 2 + g_square, score->h / 2);
 	msg_Destroy(score);
 }
@@ -291,13 +301,13 @@ void renderer_RenderGameOver ()
 	msg_Render(msg_gameover, screen_width / 2, screen_height / 2);
 }
 
-struct msg *msg_New (TTF_Font *f, const char *str)
+struct msg *msg_New (TTF_Font *f, SDL_Color c, const char *str)
 {
 	int w, h;
 	struct msg *t;
 	t = malloc(sizeof(*t));
 
-	SDL_Surface *srf = TTF_RenderText_Blended(f, str, white);
+	SDL_Surface *srf = TTF_RenderText_Blended(f, str, c);
 	SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, srf);
 	SDL_FreeSurface(srf);
 	SDL_QueryTexture(texture, NULL, NULL, &w, &h);
@@ -312,7 +322,6 @@ void msg_Destroy (struct msg *t)
 {
 	SDL_DestroyTexture(t->t);
 	free(t);
-	t = NULL;
 }
 
 void msg_Render (struct msg *t, int x, int y)
