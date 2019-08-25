@@ -1,13 +1,11 @@
-#include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 #include "game.h"
-#include "movement.h"
 
 #define POISON_PROBABILITY 0.25
 bool g_gameover;
 bool g_poison;
-int g_food;
+struct vector g_food;
 int g_score;
 int g_selected;
 int g_width, g_height, g_maxpos;
@@ -43,7 +41,8 @@ void game_Init (int width, int height)
 	g_poison = false;
 	for (int i = 0; i < SNAKELISTLEN; i++)
 		g_snakelist[i] = NULL;
-	g_snakelist[0] = snake_Create((g_maxpos + g_width) / 2 - 1, RIGHT);
+	struct vector initial = {g_width / 2 - 1, g_height / 2};
+	g_snakelist[0] = snake_Create(initial, RIGHT);
 	g_snakelist_count = 1;
 }
 
@@ -74,7 +73,7 @@ void game_Update ()
 		struct snake *s = g_snakelist[i];
 		if (!s)
 			continue;
-		if (s->head->position == g_food) {
+		if (vector_Eq(s->head->position, g_food)) {
 			if (g_poison)
 				game_OnPoison(s);
 			else
@@ -114,7 +113,8 @@ void game_OnEat ()
 
 void game_UpdateFood ()
 {
-	g_food = rand() % (g_maxpos + 1);
+	g_food.x = rand() % (g_width - 2) + 1;
+	g_food.y = rand() % (g_height - 2) + 1;
 	g_poison = chance(POISON_PROBABILITY);
 }
 

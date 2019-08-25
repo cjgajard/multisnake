@@ -1,17 +1,16 @@
-#include <stdio.h>
 #include <stdlib.h>
 #include "snake.h"
 
 /*
  * Creates a new snake_tail
  */
-struct snake_tail *snake_tail_New (int n, enum direction d)
+struct snake_tail *snake_tail_New (struct vector x, enum direction d)
 {
 	struct snake_tail *t;
 	t = malloc(sizeof(*t));
 	t->next = NULL;
 	t->direction = d;
-	t->position = n;
+	t->position = x;
 	return t;
 }
 
@@ -21,10 +20,22 @@ bool snake_Eats (struct snake *this, struct snake *other)
 {
 	if (!this || !other)
 		return false;
-	int x = this->head->position;
+	struct vector x = this->head->position;
 	struct snake_tail *t = other->head;
 	if (this == other)
 		t = t->next;
+	while (t) {
+		if (vector_Eq(t->position, x))
+			return true;
+		t = t->next;
+	}
+	return false;
+}
+
+/*
+bool snake_OutOfBorders (struct snake *this)
+{
+	struct snake_tail *t = this->head;
 	while (t) {
 		if (t->position == x)
 			return true;
@@ -32,11 +43,12 @@ bool snake_Eats (struct snake *this, struct snake *other)
 	}
 	return false;
 }
+*/
 
-struct snake *snake_Create (int n, enum direction d)
+struct snake *snake_Create (struct vector x, enum direction d)
 {
 	struct snake *this = snake_New();
-	this->head = snake_tail_New(n, d);
+	this->head = snake_tail_New(x, d);
 	this->grow = true;
 	this->length += 1;
 	return this;
@@ -98,13 +110,13 @@ void snake_Turn (struct snake *this, enum directive d)
 void snake_Update (struct snake *this)
 {
 	struct snake_tail **indirect = &this->head;
-	enum direction nd = turn((*indirect)->direction, this->directive);
-	int x;
+	enum direction nd = turn(this->directive, (*indirect)->direction);
+	struct vector x;
 
 	while (*indirect) {
 		x = (*indirect)->position;
 		enum direction d = (*indirect)->direction;
-		(*indirect)->position = movement(x, d);
+		(*indirect)->position = movement(d, x);
 		(*indirect)->direction = nd;
 		nd = d;
 		indirect = &(*indirect)->next;

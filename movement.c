@@ -7,33 +7,40 @@ int mod (int x, int N)
 	// return (x % N + N) % N;
 }
 
-int movement (int position, int direction)
+struct vector movement (enum direction d, struct vector v)
 {
-	int w = g_width;
-
-	switch (direction) {
+	struct vector v2 = {v.x, v.y};
+	switch (d) {
 	case UP:
-		return mod(position - w, g_maxpos);
+		v2.y--;
+		break;
 	case RIGHT:
-		return mod(position + 1, w) + (position / w) * w;
+		v2.x++;
+		break;
 	case DOWN:
-		return mod(position + w, g_maxpos);
+		v2.y++;
+		break;
 	case LEFT:
-		return mod(position - 1, w) + (position / w) * w;
+		v2.x--;
+		break;
+	}
+	return v2;
+}
+
+int turn (enum directive i, enum direction d)
+{
+	switch (i) {
+	case PORT:
+		return mod(d - 1, 4);
+	case STARBOARD:
+		return mod(d + 1, 4);
+	case KEEP:
 	default:
-		return position;
+		return d;
 	}
 }
 
-int turn (int direction, int directive)
+int vector_Eq(struct vector this, struct vector other)
 {
-	switch (directive) {
-	case PORT:
-		return mod(direction - 1, 4);
-	case STARBOARD:
-		return mod(direction + 1, 4);
-	// case KEEP:
-	default:
-		return direction;
-	}
+	return this.x == other.x && this.y == other.y;
 }

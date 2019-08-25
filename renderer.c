@@ -6,14 +6,6 @@
 #define LENGTH(x) (sizeof(x) / sizeof((x)[0]))
 
 /*
- * Stores a 2D position.
- */
-struct vector {
-	int x;
-	int y;
-};
-
-/*
  * Stores a text texture and its dimensions.
  */
 struct msg {
@@ -46,12 +38,7 @@ static int sdl_error (const char str[]);
 /*
  * Returns a SDL rectangle representing a square with position and dimentions.
  */
-static SDL_Rect get_rect (int square_id);
-/*
- * Returns a vector with the distance from the origin of the top-left corner
- * of a square.
- */
-static struct vector topleft_position (int square_id);
+static SDL_Rect get_rect (struct vector v);
 static void renderer_RenderFood ();
 static void renderer_RenderGameOver ();
 static void renderer_RenderGrid ();
@@ -207,13 +194,14 @@ void renderer_Render ()
 
 /* private */
 
-struct vector topleft_position (int square_id)
+SDL_Rect get_rect (struct vector v)
 {
-	int id = square_id % g_maxpos;
-	int x = (id % g_width) * g_square + g_square;
-	int y = (id / g_width) * g_square + g_square;
-	struct vector v = {x, y};
-	return v;
+	SDL_Rect rekt = {
+		v.x * g_square + 1,
+		v.y * g_square + 1,
+		g_square - 1,
+		g_square - 1};
+	return rekt;
 }
 
 void log_error (const char str[], const char err[])
@@ -301,13 +289,6 @@ void renderer_RenderGameOver ()
 	SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0xCC);
 	SDL_RenderFillRect(renderer, &rect);
 	msg_Render(msg_gameover, screen_width / 2, screen_height / 2);
-}
-
-SDL_Rect get_rect (int square_id)
-{
-	struct vector v = topleft_position(square_id);
-	SDL_Rect rekt = {v.x + 2, v.y + 1, g_square - 2, g_square - 1};
-	return rekt;
 }
 
 struct msg *msg_New (TTF_Font *f, const char *str)

@@ -8,8 +8,8 @@
  */
 struct snake_tail {
 	struct snake_tail *next;
+	struct vector position;
 	enum direction direction;
-	int position;
 };
 
 struct snake {
@@ -20,7 +20,7 @@ struct snake {
 };
 
 bool snake_Eats (struct snake *this, struct snake *other);
-struct snake *snake_Create (int n, enum direction d);
+struct snake *snake_Create (struct vector x, enum direction d);
 struct snake *snake_New (void);
 struct snake *snake_OnPoison (struct snake *this);
 void snake_Destroy (struct snake *this);
