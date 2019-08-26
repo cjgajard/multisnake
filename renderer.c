@@ -118,9 +118,9 @@ int renderer_Event ()
 			case SDLK_LEFT:
 				game_InputMove(LEFT);
 				break;
-			case SDLK_TAB:
-				game_InputRotate(1);
-				break;
+			// case SDLK_TAB:
+			//         game_InputRotate();
+			//         break;
 			case SDLK_0:
 			case SDLK_KP_0:
 				game_InputSelect(9);

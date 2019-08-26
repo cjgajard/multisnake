@@ -20,7 +20,6 @@ void game_Close (void);
  */
 void game_Init (int width, int height);
 void game_InputMove (enum direction d);
-void game_InputRotate (int dir);
 void game_InputSelect (int id);
 void game_InputTurn (enum directive d);
 void game_Update (void);

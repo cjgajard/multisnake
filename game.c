@@ -73,13 +73,6 @@ void game_InputMove (enum direction d)
 	snake_Turn(s, next);
 }
 
-void game_InputRotate (int dir)
-{
-	int x = dir > 0 ? 1 : -1;
-	int next = mod(g_selected + x, g_snakelist->length);
-	g_selected = next;
-}
-
 void game_InputSelect (int id)
 {
 	g_selected = id;
