@@ -15,7 +15,6 @@ struct vector g_food;
 static bool chance (double probability);
 static bool check_death (struct snake *s);
 static void game_UpdateFood (void);
-static void game_OnEat (void);
 static void game_OnPoison (struct snake *s);
 static void game_OnDeath (int id, struct snake *s);
 
@@ -100,11 +99,12 @@ void game_Update ()
 	while (i) {
 		struct snake *s = i->value;
 		if (vector_Eq(s->head->position, g_food)) {
+			g_score += g_snakelist->length;
 			if (g_poison)
 				game_OnPoison(s);
 			else
 				snake_OnFood(s);
-			game_OnEat();
+			game_UpdateFood();
 		}
 
 		if (check_death(s)) {
@@ -145,12 +145,6 @@ void game_OnDeath (int id, struct snake *s)
 	list_Delete(g_snakelist, id);
 	g_score -= s->length;
 	snake_Destroy(s);
-}
-
-void game_OnEat ()
-{
-	g_score += g_snakelist->length;
-	game_UpdateFood();
 }
 
 void game_OnPoison (struct snake *s)
