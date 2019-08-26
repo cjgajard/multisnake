@@ -14,6 +14,11 @@ struct snake_tail *snake_tail_New (struct vector x, enum direction d)
 	return t;
 }
 
+void snake_tail_Destroy (struct snake_tail *this)
+{
+	free(this);
+}
+
 /* public */
 
 bool snake_Eats (struct snake *this, struct snake *other)
@@ -66,7 +71,7 @@ void snake_Destroy (struct snake *this)
 	struct snake_tail *t = this->head;
 	while (t) {
 		struct snake_tail *n = t->next;
-		free(t);
+		snake_tail_Destroy(t);
 		t = n;
 	}
 	free(this);

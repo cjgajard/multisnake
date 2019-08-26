@@ -40,11 +40,11 @@ static int sdl_error (const char str[]);
  * Returns a SDL rectangle representing a square with position and dimentions.
  */
 static SDL_Rect get_rect (struct vector v);
-static void renderer_RenderFood ();
-static void renderer_RenderGameOver ();
-static void renderer_RenderGrid ();
-static void renderer_RenderScore ();
-static void renderer_RenderSnake (int id);
+static void renderer_RenderFood (void);
+static void renderer_RenderGameOver (void);
+static void renderer_RenderGrid (void);
+static void renderer_RenderScore (void);
+static void renderer_RenderSnake (int id, struct snake *s);
 static struct msg *msg_New (TTF_Font *f, SDL_Color c, const char *str);
 static void msg_Destroy (struct msg *t);
 static void msg_Render (struct msg *t, int x, int y);
@@ -209,13 +209,16 @@ void renderer_Render ()
 {
 	renderer_RenderGrid();
 	renderer_RenderFood();
-	for (int i = 0; i < SNAKELISTLEN; i++)
-		renderer_RenderSnake(i);
+	struct list_item *i = g_snakelist->head;
+	while (i) {
+		renderer_RenderSnake(i->id, i->value);
+		i = i->next;
+	}
 	renderer_RenderScore();
 	if (g_gameover)
 		renderer_RenderGameOver();
 	SDL_RenderPresent(renderer);
-	SDL_Delay(200);
+	SDL_Delay(128);
 }
 
 /* private */
@@ -273,9 +276,8 @@ void renderer_RenderGrid ()
 	}
 }
 
-void renderer_RenderSnake (int id)
+void renderer_RenderSnake (int id, struct snake *s)
 {
-	struct snake *s = g_snakelist[id];
 	if (s == NULL)
 		return;
 	struct snake_tail *current = s->head;

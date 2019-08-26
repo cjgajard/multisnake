@@ -2,7 +2,7 @@ CC = gcc
 CFLAGS = -Wall
 CLIBS = -lSDL2 -lSDL2_ttf
 DEBUG ?= 0
-OBJ = main.o movement.o snake.o game.o renderer.o
+OBJ = main.o movement.o snake.o game.o renderer.o list.o
 
 ifeq ($(DEBUG), 1)
 	CFLAGS += -DDEBUG

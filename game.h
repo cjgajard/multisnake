@@ -1,16 +1,16 @@
 #ifndef GAME_H
 #define GAME_H
 #include <stdbool.h>
+#include "list.h"
 #include "snake.h"
 #define SNAKELISTLEN 10
 
 extern bool g_gameover;
 extern bool g_poison;
-extern struct vector g_food;
 extern int g_score;
 extern int g_selected;
-extern int g_snakelist_count;
-extern struct snake *g_snakelist[SNAKELISTLEN];
+extern struct list *g_snakelist;
+extern struct vector g_food;
 
 void game_Close (void);
 /*

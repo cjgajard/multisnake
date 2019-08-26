@@ -1,21 +1,20 @@
 #include <stdlib.h>
 #include <time.h>
 #include "game.h"
+#include "list.h"
 
 #define POISON_PROBABILITY 0.25
 bool g_gameover;
 bool g_poison;
-struct vector g_food;
 int g_score;
 int g_selected;
 int g_width, g_height, g_maxpos;
-int g_snakelist_count;
-struct snake *g_snakelist[SNAKELISTLEN];
+struct list *g_snakelist;
+struct vector g_food;
 
 static bool chance (double probability);
 static bool check_collision (void);
 static bool check_border (void);
-static bool is_selection (void);
 static void game_UpdateFood (void);
 static void game_OnEat (void);
 static void game_OnPoison (struct snake *s);
@@ -24,10 +23,14 @@ static void game_OnPoison (struct snake *s);
 
 void game_Close ()
 {
-	for (int i = 0; i < SNAKELISTLEN; i++) {
-		if (g_snakelist[i])
-			snake_Destroy(g_snakelist[i]);
+	struct list_item *i = g_snakelist->head;
+	while (i) {
+		struct list_item *n = i->next;
+		struct snake *s = i->value;
+		snake_Destroy(s);
+		i = n;
 	}
+	list_Destroy(g_snakelist);
 }
 
 void game_Init (int width, int height)
@@ -41,18 +44,18 @@ void game_Init (int width, int height)
 	g_selected = -1;
 	game_UpdateFood();
 	g_poison = false;
-	for (int i = 0; i < SNAKELISTLEN; i++)
-		g_snakelist[i] = NULL;
+	g_snakelist = list_New();
+
 	struct vector initial = {g_width / 2 - 1, g_height / 2};
-	g_snakelist[0] = snake_Create(initial, RIGHT);
-	g_snakelist_count = 1;
+	list_Append(g_snakelist, snake_Create(initial, RIGHT));
 }
 
 void game_InputMove (enum direction d)
 {
-	if (!is_selection())
+	struct snake *s = list_Get(g_snakelist, g_selected);
+	if (!s)
 		return;
-	enum direction now = g_snakelist[g_selected]->head->direction;
+	enum direction now = s->head->direction;
 	enum directive next;
 	switch (now - d) {
 	case -1:
@@ -67,40 +70,34 @@ void game_InputMove (enum direction d)
 		next = KEEP;
 		break;
 	}
-	snake_Turn(g_snakelist[g_selected], next);
+	snake_Turn(s, next);
 }
 
 void game_InputRotate (int dir)
 {
 	int x = dir > 0 ? 1 : -1;
-	int next = mod(g_selected + x, g_snakelist_count);
-	if (next >= 0 && next < sizeof(g_snakelist))
-		g_selected = next;
-	else
-		g_selected = -1;
+	int next = mod(g_selected + x, g_snakelist->length);
+	g_selected = next;
 }
 
 void game_InputSelect (int id)
 {
-	if (id >= 0 && id < sizeof(g_snakelist) && id != g_selected)
-		g_selected = id;
-	else
-		g_selected = -1;
+	g_selected = (id == g_selected) ? -1 : id;
 }
 
 void game_InputTurn (enum directive d)
 {
-	if (!is_selection())
+	struct snake *s = list_Get(g_snakelist, g_selected);
+	if (!s)
 		return;
-	snake_Turn(g_snakelist[g_selected], d);
+	snake_Turn(s, d);
 }
 
 void game_Update ()
 {
-	for (int i = 0; i < g_snakelist_count; i++) {
-		struct snake *s = g_snakelist[i];
-		if (!s)
-			continue;
+	struct list_item *i = g_snakelist->head;
+	while (i) {
+		struct snake *s = i->value;
 		if (vector_Eq(s->head->position, g_food)) {
 			if (g_poison)
 				game_OnPoison(s);
@@ -109,6 +106,7 @@ void game_Update ()
 			game_OnEat();
 		}
 		snake_Update(s);
+		i = i->next;
 	}
 	g_gameover = check_collision() || check_border();
 }
@@ -124,34 +122,31 @@ bool chance (double probability)
 
 bool check_collision ()
 {
-	for (int i = 0; i < g_snakelist_count; i++) {
-		for (int j = 0; j < g_snakelist_count; j++) {
-			if (snake_Eats(g_snakelist[i], g_snakelist[j]))
+	struct list_item *i = g_snakelist->head;
+	while (i) {
+		struct snake *s = i->value;
+		struct list_item *j = g_snakelist->head;
+		while (j) {
+			struct snake *s2 = j->value;
+			if (snake_Eats(s, s2))
 				return true;
+			j = j->next;
 		}
+		i = i->next;
 	}
 	return false;
 }
 
 bool check_border ()
 {
-	for (int i = 0; i < g_snakelist_count; i++) {
-		struct snake *s = g_snakelist[i];
-		if (!s)
-			continue;
+	struct list_item *i = g_snakelist->head;
+	while (i) {
+		struct snake *s = i->value;
 		if (snake_InBorder(s))
 			return true;
+		i = i->next;
 	}
 	return false;
-}
-
-bool is_selection ()
-{
-	if (g_selected < 0 || g_selected >= g_snakelist_count)
-		return false;
-	if (!g_snakelist[g_selected])
-		return false;
-	return true;
 }
 
 void game_OnEat ()
@@ -169,10 +164,10 @@ void game_UpdateFood ()
 
 void game_OnPoison (struct snake *s)
 {
-	if (g_snakelist_count >= SNAKELISTLEN)
+	if (g_snakelist->length >= SNAKELISTLEN)
 		return;
 	struct snake *next = snake_OnPoison(s);
 	if (!next)
 		return;
-	g_snakelist[g_snakelist_count++] = next;
+	list_Append(g_snakelist, next);
 }
