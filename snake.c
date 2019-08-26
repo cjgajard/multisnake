@@ -21,7 +21,7 @@ void snake_tail_Destroy (struct snake_tail *this)
 
 /* public */
 
-bool snake_Eats (struct snake *this, struct snake *other)
+bool snake_IsEating (struct snake *this, struct snake *other)
 {
 	if (!this || !other)
 		return false;
