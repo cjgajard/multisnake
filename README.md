@@ -1,22 +1,23 @@
 # multisnake
 
-## Dependencies
-
-- gcc
-- SDL2
-
 ## Play
 
 ```sh
-make && bin/main
+./multisnake
 ```
 
-## Development
+* You must select a snake using the numbers or the keypad numbers to move it.
+* You can move the snakes with the arrows, WASD or HJKL.
+* You can turn the snakes to port or starboard with QE or YU.
 
-There is a `test` task in make file.
-You need to tell it what to test.  Example:
+## Dependencies
+
 ```sh
-make test TEST=movement DEPS=movement.o
+sudo apt install libsdl2-dev libsdl2-ttf-dev
 ```
-That will compile (without linking) movement.c and
-compile, link and run test_movement.c
+
+## Compiling
+
+```sh
+make
+```
