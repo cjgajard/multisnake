@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS = -Wall
-CLIBS = -lSDL2 -lSDL2_ttf
+CLIBS = -lSDL2 -lSDL2_ttf -lrt
 DEBUG ?= 0
 OBJ = main.o movement.o snake.o game.o renderer.o list.o
 

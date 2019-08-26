@@ -8,6 +8,7 @@ bool g_gameover;
 bool g_poison;
 int g_score;
 int g_selected;
+int g_speed;
 int g_width, g_height, g_maxpos;
 struct list *g_snakelist;
 struct vector g_food;
@@ -44,7 +45,7 @@ void game_Init (int width, int height)
 	game_UpdateFood();
 	g_poison = false;
 	g_snakelist = list_New();
-
+	g_speed = 8;
 	struct vector initial = {g_width / 2 - 1, g_height / 2};
 	list_Append(g_snakelist, snake_Create(initial, RIGHT));
 	g_score = 2;

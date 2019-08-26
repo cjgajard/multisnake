@@ -218,7 +218,6 @@ void renderer_Render ()
 	if (g_gameover)
 		renderer_RenderGameOver();
 	SDL_RenderPresent(renderer);
-	SDL_Delay(128);
 }
 
 /* private */

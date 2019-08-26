@@ -9,6 +9,7 @@ extern bool g_gameover;
 extern bool g_poison;
 extern int g_score;
 extern int g_selected;
+extern int g_speed;
 extern struct list *g_snakelist;
 extern struct vector g_food;
 
